@@ -1,85 +1,66 @@
-from utils.data_func import file_func
-from utils.data_func import from_key_2, from_key_2_c
-from utils.data_func import from_key_3, from_key_3_c
-from utils.data_func import to_key_2, to_key_2_c
-from utils.data_func import to_key_3, to_key_3_c
+from utils.utils import file_func, line_date, from_to_key
 import pytest
 
 
+# фикстура для тестирования функции file_func() (в проекте есть тестовый  json)
 @pytest.fixture
 def json_fixture():
-    temp_data = '/Users/mac/Dev/Course_work_3/test.json'
-    return temp_data
+    file_path = '/Users/mac/Dev/Course_work_3/test.json'
+    return file_path
 
 
+# фикстура для тестирования функции получения времени line_date()
 @pytest.fixture
-def key_fixture_2():
+def line_date_fixture():
     temp_data = [{
-        "from": "Card 2222222222222222",
-        "to": "To 11111111111111111111"
+        "id": 441945886,
+        "state": "EXECUTED",
+        "date": "2019-08-26T10:50:58.294041",
+        "operationAmount": {
+            "amount": "31957.58",
+            "currency": {
+                "name": "руб.",
+                "code": "RUB"
+            }
+        },
+        "description": "Перевод организации",
+        "from": "Maestro 1596837868705199",
+        "to": "Счет 64686473678894779589"
     }]
     return temp_data
 
 
+# фикстура для тестирования функции from_to_key()
 @pytest.fixture
-def key_fixture_2_c():
+def from_to_key_fixture():
     temp_data = [{
-        "from": "Счет 22222222222222222222",
+        "from": "Visa Classic 6831982476737658",
         "to": "Счет 11111111111111111111"
     }]
     return temp_data
 
 
+# вторая фикстура для тестирования функции from_to_key()
 @pytest.fixture
-def key_fixture_3():
+def from_to_key_fixture_2():
     temp_data = [{
-        "from": "Test Card 3333333333333333",
-        "to": "My Card 55555555555555555555"
-    }]
-    return temp_data
-
-
-@pytest.fixture
-def key_fixture_3_c():
-    temp_data = [{
-        "from": "Счет Card 3333333333333333",
-        "to": "Счет Test 55555555555555555555"
+        "from": "Счет 11111111111111111111",
+        "to": "Maestro 4598300720424501"
     }]
     return temp_data
 
 
 def test_file_func(json_fixture):
-    assert file_func(json_fixture, 'a') == [{'a': 444, 'b': 555, 'c': 666},
-                                            {'a': 111, 'b': 222, 'c': 333}]
+    assert file_func(json_fixture, 'a') == [{'a': 10, 'b': 2, 'c': 3},
+                                            {'a': 7, 'b': 8, 'c': 90},
+                                            {'a': 4, 'b': 50, 'c': 6}]
 
 
-def test_from_key_2(key_fixture_2):
-    assert from_key_2(key_fixture_2, 0) == 'Card 2222 22** **** 2222 --> '
+def test_line_date(line_date_fixture):
+    assert line_date(line_date_fixture, 0) == '26.08.2019'
 
 
-def test_from_key_2_c(key_fixture_2_c):
-    assert from_key_2_c(key_fixture_2_c, 0) == 'Счет **2222 --> '
-
-
-def test_from_key_3(key_fixture_3):
-    assert from_key_3(key_fixture_3, 0) == 'Test Card 3333 33** **** 3333 --> '
-
-
-def test_from_key_3_c(key_fixture_3_c):
-    assert from_key_3_c(key_fixture_3_c, 0) == 'Счет **3333 --> '
-
-
-def test_to_key_2(key_fixture_2):
-    assert to_key_2(key_fixture_2, 0) == 'To 1111 11** **** 1111'
-
-
-def test_to_key_2_c(key_fixture_2_c):
-    assert to_key_2_c(key_fixture_2_c, 0) == 'Счет **1111'
-
-
-def test_to_key_3(key_fixture_3):
-    assert to_key_3(key_fixture_3, 0) == 'My Card 5555 55** **** 5555 '
-
-
-def test_to_key_3_c(key_fixture_3_c):
-    assert to_key_3_c(key_fixture_3_c, 0) == 'Счет **5555'
+def test_from_to_key(from_to_key_fixture, from_to_key_fixture_2):
+    assert from_to_key(from_to_key_fixture, 'from', 0) == "Visa Classic 6831 98** **** 7658"
+    assert from_to_key(from_to_key_fixture_2, 'from', 0) == "Счет **1111"
+    assert from_to_key(from_to_key_fixture_2, 'to', 0) == "Maestro 4598 30** **** 4501"
