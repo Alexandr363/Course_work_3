@@ -10,12 +10,13 @@ transactions = file_func(FILENAME)
 
 # запускаем основной цикл программы, выводим результат
 for i in range(5):
-    print(line_date(transactions, i), end=' ')
-    print(transactions[i]['description'])
+    if transactions[i]['state'] == "EXECUTED":
+        print(line_date(transactions, i), end=' ')
+        print(transactions[i]['description'])
 
-    print(from_to_key(transactions, 'from', i), '--> ', end='')
-    print(from_to_key(transactions, 'to', i))
+        print(from_to_key(transactions, 'from', i), '--> ', end='')
+        print(from_to_key(transactions, 'to', i))
 
-    print(f"{transactions[i]['operationAmount']['amount']}", end=' ')
-    print(f"{transactions[i]['operationAmount']['currency']['name']}")
-    print()
+        print(f"{transactions[i]['operationAmount']['amount']}", end=' ')
+        print(f"{transactions[i]['operationAmount']['currency']['name']}")
+        print()
