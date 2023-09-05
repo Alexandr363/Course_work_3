@@ -1,66 +1,80 @@
-from utils.utils import file_func, line_date, from_to_key
 import pytest
 
+from utils.utils import (filter_by_status, sort_by_data, data_transform,
+                         mask_card, mask_number, prepare_one_operation)
 
-# фикстура для тестирования функции file_func() (в проекте есть тестовый  json)
+
 @pytest.fixture
-def json_fixture():
-    file_path = '/Users/mac/Dev/Course_work_3/test.json'
-    return file_path
+def filter_by_status_fixture():
+    data = [{"state": "CANCELED"}, {"state": "CANCELED"}, ]
+    return data
 
 
-# фикстура для тестирования функции получения времени line_date()
 @pytest.fixture
-def line_date_fixture():
-    temp_data = [{
-        "id": 441945886,
+def sort_by_data_fixture():
+    data = [{"date": "2018-08-26T10:50:58.294041"},
+            {"date": "2019-08-26T10:50:58.294041"}, ]
+    return data
+
+
+@pytest.fixture
+def mask_card_fixture():
+    data = "Visa Classic 4610247282706784"
+    return data
+
+
+@pytest.fixture
+def mask_number_fixture():
+    data = "Visa Classic 4610247282706784"
+    return data
+
+
+@pytest.fixture()
+def prepare_one_operation_fixture():
+    data = {
+        "id": 431131847,
         "state": "EXECUTED",
-        "date": "2019-08-26T10:50:58.294041",
+        "date": "05.05.2018",
         "operationAmount": {
-            "amount": "31957.58",
+            "amount": "56071.02",
             "currency": {
                 "name": "руб.",
                 "code": "RUB"
             }
         },
-        "description": "Перевод организации",
-        "from": "Maestro 1596837868705199",
-        "to": "Счет 64686473678894779589"
-    }]
-    return temp_data
+        "description": "Перевод с карты на счет",
+        "from": "MasterCard 9454780748494532",
+        "to": "Счет 51958934737718181351"
+    },
+    return data
 
 
-# фикстура для тестирования функции from_to_key()
-@pytest.fixture
-def from_to_key_fixture():
-    temp_data = [{
-        "from": "Visa Classic 6831982476737658",
-        "to": "Счет 11111111111111111111"
-    }]
-    return temp_data
+def test_filter_by_status(filter_by_status_fixture):
+    assert filter_by_status(filter_by_status_fixture) == []
 
 
-# вторая фикстура для тестирования функции from_to_key()
-@pytest.fixture
-def from_to_key_fixture_2():
-    temp_data = [{
-        "from": "Счет 11111111111111111111",
-        "to": "Maestro 4598300720424501"
-    }]
-    return temp_data
+def test_sort_by_data(sort_by_data_fixture):
+    assert sort_by_data(sort_by_data_fixture) == [
+        {"date": "2019-08-26T10:50:58.294041"},
+        {"date": "2018-08-26T10:50:58.294041"}, ]
 
 
-def test_file_func(json_fixture):
-    assert file_func(json_fixture, 'a') == [{'a': 10, 'b': 2, 'c': 3},
-                                            {'a': 7, 'b': 8, 'c': 90},
-                                            {'a': 4, 'b': 50, 'c': 6}]
+def test_data_transform(sort_by_data_fixture):
+    assert data_transform(sort_by_data_fixture) == [
+        {"date": "26.08.2018"},
+        {"date": "26.08.2019"}, ]
 
 
-def test_line_date(line_date_fixture):
-    assert line_date(line_date_fixture, 0) == '26.08.2019'
+def test_mask_card(mask_card_fixture):
+    assert mask_card(mask_card_fixture) == 'Visa Classic'
 
 
-def test_from_to_key(from_to_key_fixture, from_to_key_fixture_2):
-    assert from_to_key(from_to_key_fixture, 'from', 0) == "Visa Classic 6831 98** **** 7658"
-    assert from_to_key(from_to_key_fixture_2, 'from', 0) == "Счет **1111"
-    assert from_to_key(from_to_key_fixture_2, 'to', 0) == "Maestro 4598 30** **** 4501"
+def test_mask_number(mask_number_fixture):
+    assert mask_number(mask_number_fixture) == '4610 24** **** 6784'
+
+
+def test_prepare_one_operation(prepare_one_operation_fixture):
+    assert prepare_one_operation(prepare_one_operation_fixture, 0) == {
+        '1': ('05.05.2018', 'Перевод с карты на счет'),
+        '2': ('MasterCard', '9454 78** **** 4532', 'Счет', '**1351'),
+        '3': ('56071.02', 'руб.')}
